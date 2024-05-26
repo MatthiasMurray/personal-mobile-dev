@@ -1,46 +1,50 @@
-resource "google_cloud_functions_function" "write_to_bucket" {
-  name		= "write-to-bucket-function"
-  entry_point	= "write_to_bucket"
+resource "google_storage_bucket" "bucket" {
+  name		= "hello-world-bucket"
+  location	= "US"
+  force_destroy = true
+}
+
+resource "google_cloudfunctions_function" "default" {
+  name		= "hello-world-function"
+  description	= "A function to write 'Hello World' to a bucket"
   runtime	= "python39"
 
-  source_archive_bucket = google_storage_bucket.function_source.name
-  source_archive_object = google_storage_bucket_object.function_code.name
+  available_memory_mb = 256
+  source_archive_bucket = google_storage_bucket.bucket.name
+  source_archive_object = "${google_storage_bucket_object.source.name}"
 
-  trigger_http = true
-  event_trigger {
-    event_type = "google.pubsub.topic.publish"
-    resource   = google_pubsub_topic.event_topic.id
+  entry_point	= "hello_world"
+  trigger_http	= true
+
+  environment_variables = {
+    BUCKET_NAME = google_storage_bucket.bucket.name
   }
+
+  service_account_email = "terraform-admin-sa@cicd-personal-project.iam.gserviceaccount.com"
 }
 
-resource "google_storage_bucket" "function_source" {
-  name = "my-function-source-bucket"
+resource "googl_storage_bucket_object" "source" {
+  name	= "source-archive.zip"
+  bucket = google_storage_bucket.bucket.name
+  source = "functions/zipped/source-archive.zip"
 }
 
-resource "google_storage_bucket_object" "function_code" {
-  name = "function.zip"
-  bucket = google_storage_bucket.function_source.name
-  source = "path/to/your/function.zip"
+resource "google_cloudfunctions_function_iam_member" "invoker" {
+  project	= google_cloudfunctions_function.default.project
+  region	= google_cloudfunctions_function.default.region
+  cloud_function = google_cloudfunctions_function.default.name
+
+  role		= "roles/cloudfunctions.invoker"
+  member	= "serviceAccount:terraform-admin-sa@cicd-personal-project.iam.gserviceaccount.com"
 }
 
-resource "google_pubsub_topic" "event_topic" {
-  name = "event-topic"
-}
+resource "google_cloud_scheduler_job" "scheduler" {
+  name		= "function-scheduler"
+  schedule	= "0 17 26 5 *"
+  time_zone	= "America/Denver"
 
-resource "google_project_iam_member" "storage_admin" {
-  project	= var.project_id
-  role		= "roles/storage.admin"
-  member	= "serviceAccount:${var.cicd_service_account_email}"
-}
-
-resource "google_project_iam_member" "functions_developer" {
-  project	= var.project_id
-  role		= "roles/cloudfunctions.developer"
-  member	= "serviceAccount:${var.cicd_service_account_email}"
-}
-
-resource "google_project_iam_member" "pubsub_admin" {
-  project	= var.project_id
-  role		= "roles/pubsub.admin"
-  member	= "serviceAccount:${var.cicd_service_account_email}"
+  http_target {
+    http_method = "GET"
+    url		= google_cloudfunctions_function.default.https_trigger_url
+  }
 }
