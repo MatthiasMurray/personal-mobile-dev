@@ -1,5 +1,14 @@
 provider "google" {
-  credentials	= file(var.credentials_file)
-  project	= var.project_id
-  region	= var.region
+  credentials = file("~/sa.json")
+  project = "personal-gcp-dev"
+  region = "us-central1"
+}
+
+terraform {
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+      version = "~> 3.5"
+    }
+  }
 }
