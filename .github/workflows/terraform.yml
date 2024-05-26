@@ -20,7 +20,8 @@ jobs:
           terraform_version: '1.0.0'
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="credentials=${{ env.GCP_CREDENTIALS }}"
+        working-directory: ./terraform
 
       - name: Terraform Plan
         run: terraform plan
