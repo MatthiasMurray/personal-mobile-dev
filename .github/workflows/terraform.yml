@@ -23,7 +23,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           project_id: 'cicd-personal-project'
-          export_default_credentials: true
 
       - name: Configure gcloud for target project
         run: gcloud config set project ${{ env.GOOGLE_PROJECT }}
