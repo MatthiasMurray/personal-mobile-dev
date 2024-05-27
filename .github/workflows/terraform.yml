@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - main
 
 jobs:
   deploy:
@@ -19,7 +20,7 @@ jobs:
       
       - name: Decode GCP Credentials
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > ${{ github.workspace }}/gcp-key.json
+          echo '${{ secrets.GCP_SA_KEY }}' | base64 --decode > ${{ github.workspace }}/gcp-key.json
         shell: bash
 
       - name: Set up Cloud SDK
