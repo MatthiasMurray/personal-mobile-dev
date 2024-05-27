@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = file("~/sa.json")
+  credentials = file("~/service-account-cicd-key.json")
   project = "personal-gcp-dev"
   region = "us-central1"
 }
