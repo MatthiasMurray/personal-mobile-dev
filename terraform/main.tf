@@ -23,7 +23,7 @@ resource "google_cloudfunctions_function" "default" {
   service_account_email = "terraform-admin-sa@cicd-personal-project.iam.gserviceaccount.com"
 }
 
-resource "googl_storage_bucket_object" "source" {
+resource "google_storage_bucket_object" "source" {
   name	= "source-archive.zip"
   bucket = google_storage_bucket.bucket.name
   source = "functions/zipped/source-archive.zip"
