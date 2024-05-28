@@ -47,7 +47,7 @@ jobs:
       - name: Enable GCP APIs
         if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
         run: |
-          gcloud auth login personal-gcp-${{ github.ref }}
+          gcloud config set project personal-gcp-${{ github.ref }}
           gcloud services enable compute.googleapis.com
           gcloud services enable cloudresourcemanager.googleapis.com
           gcloud services enable cloudbilling.googleapis.com
