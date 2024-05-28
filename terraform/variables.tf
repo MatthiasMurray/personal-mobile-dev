@@ -19,7 +19,7 @@ variable "region" {
 variable "credentials_file_path" {
   type        = string
   description = "Path to GCP service account JSON"
-  default     = "~/service-account-cicd-key.json"
+  default     = "~/new-service-account-cicd-key.json"
 }
 
 variable "bucket_name" {
