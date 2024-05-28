@@ -45,6 +45,6 @@ resource "google_cloud_scheduler_job" "scheduler" {
 
   http_target {
     http_method = "GET"
-    url         = google_cloudfunctions_function.cf.https_trigger_url
+    uri         = google_cloudfunctions_function.cf.https_trigger_url
   }
 }
