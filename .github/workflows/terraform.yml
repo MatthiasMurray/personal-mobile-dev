@@ -47,13 +47,13 @@ jobs:
       - name: Enable GCP APIs
         if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
         run: |
-          gcloud config set project personal-gcp-${{ github.ref_name }}
           gcloud services enable compute.googleapis.com
           gcloud services enable cloudresourcemanager.googleapis.com
           gcloud services enable cloudbilling.googleapis.com
           gcloud services enable iam.googleapis.com
           gcloud services enable cloudfunctions.googleapis.com
         env:
+          GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
           CLOUDSDK_CORE_PROJECT: personal-gcp-${{ github.ref_name }}
 
       - name: Terraform Plan
