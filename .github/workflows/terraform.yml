@@ -58,7 +58,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
-        run: terraform plan
+        run: terraform plan -var="credentials_file_path=${{ github.workspace }}/gcp-creds.json"
         continue-on-error: false
         env:
           GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
@@ -67,7 +67,7 @@ jobs:
 
       - name: Terraform Apply
         if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod') && github.event_name == 'push'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="credentials_file_path=${{ github.workspace }}/gcp-creds.json"
         env:
           GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
           TF_VAR_project_env: ${{ github.ref_name }}
