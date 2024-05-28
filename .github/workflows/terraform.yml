@@ -24,8 +24,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Decode GCP Credentials
-        run: echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > gcp-creds.json
-        shell: bash
+        run: echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > ${{ github.workspace }}/gcp-creds.json
 
       - name: Configure gcloud CLI
         run: gcloud auth configure-docker
@@ -45,6 +44,16 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
+      - name: Enable GCP APIs
+        run: |
+          gcloud services enable compute.googleapis.com
+          gcloud services enable cloudresourcemanager.googleapis.com
+          gcloud services enable cloudbilling.googleapis.com
+          gcloud services enable iam.googleapis.com
+          gcloud services enable cloudfunctions.googleapis.com
+        env:
+          CLOUDSDK_CORE_PROJECT: personal-gcp-${{ github.ref_name }}
+
       - name: Terraform Plan
         id: plan
         run: terraform plan
@@ -52,6 +61,7 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
           TF_VAR_project_env: ${{ github.ref_name }}
+          TF_LOG: DEBUG
 
       - name: Terraform Apply
         if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod') && github.event_name == 'push'

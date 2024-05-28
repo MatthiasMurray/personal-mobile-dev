@@ -12,5 +12,5 @@ terraform {
 provider "google" {
   credentials = file(var.credentials_file_path)
   project     = "personal-gcp-${var.project_env}"
-  region      = "us-central1"
+  region      = var.region
 }
