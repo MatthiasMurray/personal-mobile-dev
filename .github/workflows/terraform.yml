@@ -58,6 +58,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
+        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
         run: terraform plan
         continue-on-error: false
         env:
