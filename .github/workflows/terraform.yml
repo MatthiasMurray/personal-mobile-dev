@@ -59,3 +59,4 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
           TF_VAR_project_env: ${{ github.ref_name }}
+          TF_VAR_project_id: personal-gcp-${{ github.ref_name }}

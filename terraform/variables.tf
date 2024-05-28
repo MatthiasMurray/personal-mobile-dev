@@ -7,7 +7,7 @@ variable "project_env" {
 variable "project_id" {
   type		= string
   description	= "Target GCP project ID"
-  default	= "personal-gcp-${var.project_env}"
+  default	= "personal-gcp-dev"
 }
 
 variable "region" {
