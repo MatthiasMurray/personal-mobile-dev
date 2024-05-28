@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("~/service-account-cicd-key.json")
+  credentials = ${{ secrets.GCP_SA_KEY }}
   project     = "personal-gcp-dev"
   region      = "us-central1"
 }
