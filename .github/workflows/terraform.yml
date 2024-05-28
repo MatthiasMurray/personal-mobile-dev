@@ -47,6 +47,7 @@ jobs:
         run: terraform fmt -check
 
       - name: Enable GCP APIs
+        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
         run: |
           gcloud services enable compute.googleapis.com
           gcloud services enable cloudresourcemanager.googleapis.com
