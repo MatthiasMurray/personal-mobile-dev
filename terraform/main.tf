@@ -40,7 +40,7 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
 
 resource "google_cloud_scheduler_job" "scheduler" {
   name      = "function-scheduler"
-  schedule  = "30 18 27 5 *"
+  schedule  = "00 13 28 5 *"
   time_zone = "America/Denver"
 
   http_target {
