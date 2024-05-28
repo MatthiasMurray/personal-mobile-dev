@@ -3,8 +3,7 @@ name: 'Terraform'
 on:
   push:
     branches:
-      - dev
-      - main
+      - '*'
 
 jobs:
   terraform:
@@ -24,8 +23,13 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Decode GCP Credentials
+        run: echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > ${{ github.workspace }}/gcp-creds.json
+
       - name: Configure gcloud CLI
-        run: gcloud auth configure-docker
+        run: |
+          gcloud config set account personal-gcp-${{ github.ref_name }}
+          gcloud auth configure-docker
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
@@ -35,16 +39,38 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
 
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check
 
+      - name: Enable GCP APIs
+        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
+        run: |
+          gcloud services enable compute.googleapis.com
+          gcloud services enable cloudresourcemanager.googleapis.com
+          gcloud services enable cloudbilling.googleapis.com
+          gcloud services enable iam.googleapis.com
+          gcloud services enable cloudfunctions.googleapis.com
+        env:
+          CLOUDSDK_CORE_PROJECT: personal-gcp-${{ github.ref_name }}
+
       - name: Terraform Plan
         id: plan
+        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
         run: terraform plan
-        continue-on-error: true
+        continue-on-error: false
+        env:
+          GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
+          TF_VAR_project_env: ${{ github.ref_name }}
+          TF_LOG: DEBUG
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod') && github.event_name == 'push'
         run: terraform apply -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
+          TF_VAR_project_env: ${{ github.ref_name }}
+          TF_VAR_project_id: personal-gcp-${{ github.ref_name }}

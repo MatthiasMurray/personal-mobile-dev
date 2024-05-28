@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "google" {
-  credentials = ${{ secrets.GCP_SA_KEY }}
-  project     = "personal-gcp-dev"
-  region      = "us-central1"
+  credentials = file(var.credentials_file_path)
+  project     = "personal-gcp-${var.project_env}"
+  region      = var.region
 }
