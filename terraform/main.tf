@@ -30,9 +30,9 @@ resource "google_storage_bucket_object" "source" {
 }
 
 resource "google_cloudfunctions_function_iam_member" "invoker" {
-  project        = google_cloudfunctions_function.default.project
-  region         = google_cloudfunctions_function.default.region
-  cloud_function = google_cloudfunctions_function.default.name
+  project        = google_cloudfunctions_function.cf.project
+  region         = google_cloudfunctions_function.cf.region
+  cloud_function = google_cloudfunctions_function.cf.name
 
   role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:terraform-admin-sa@cicd-personal-project.iam.gserviceaccount.com"
