@@ -32,7 +32,6 @@ jobs:
         with:
           project_id: personal-gcp-${{ github.ref_name }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
 
       - name: Set GCP project
         if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod')
